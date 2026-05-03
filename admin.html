@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Shabda Marathi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --saffron: #FF6B00; --deep-red: #C0392B; --golden: #F39C12; --purple: #6C3483; --border: #FFD580; --bg: #fff8f0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); min-height: 100vh; }
+
+        /* Login Screen */
+        #login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+        .login-card { background: white; border-radius: 20px; padding: 48px 40px; max-width: 420px; width: 100%; box-shadow: 0 8px 32px rgba(255,107,0,0.12); border: 2px solid var(--border); text-align: center; }
+        .login-logo { font-size: 3rem; margin-bottom: 16px; }
+        .login-title { font-family: 'Poppins', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--deep-red); margin-bottom: 6px; }
+        .login-subtitle { color: #999; font-size: 0.9rem; margin-bottom: 32px; }
+        .login-input { width: 100%; padding: 14px 18px; border: 2px solid var(--border); border-radius: 12px; font-size: 1rem; font-family: 'Inter', sans-serif; margin-bottom: 16px; outline: none; transition: border-color 0.3s; }
+        .login-input:focus { border-color: var(--saffron); }
+        .login-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--purple), var(--deep-red), var(--saffron)); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(255,107,0,0.3); }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,107,0,0.4); }
+        .login-error { color: var(--deep-red); font-size: 0.88rem; margin-top: 10px; display: none; }
+
+        /* Admin Panel */
+        #admin-panel { display: none; }
+        .admin-header { background: linear-gradient(135deg, var(--purple), var(--deep-red), var(--saffron)); color: white; padding: 20px 28px; display: flex; justify-content: space-between; align-items: center; }
+        .admin-header h1 { font-family: 'Poppins', sans-serif; font-size: 1.3rem; font-weight: 800; }
+        .logout-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: all 0.3s; }
+        .logout-btn:hover { background: rgba(255,255,255,0.35); }
+
+        .admin-container { max-width: 800px; margin: 0 auto; padding: 32px 20px; }
+
+        /* Add Form */
+        .form-card { background: white; border-radius: 20px; padding: 32px; margin-bottom: 32px; box-shadow: 0 4px 20px rgba(255,107,0,0.08); border: 2px solid var(--border); }
+        .form-title { font-family: 'Poppins', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--deep-red); margin-bottom: 24px; padding-bottom: 12px; border-bottom: 2px solid var(--border); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+        .form-label { font-weight: 600; font-size: 0.88rem; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-control { padding: 13px 16px; border: 2px solid var(--border); border-radius: 10px; font-size: 0.95rem; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.3s; background: #fffdf8; }
+        .form-control:focus { border-color: var(--saffron); }
+        select.form-control { cursor: pointer; }
+        textarea.form-control { resize: vertical; min-height: 100px; }
+        .submit-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--golden), var(--saffron)); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(243,156,18,0.3); margin-top: 8px; }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(243,156,18,0.4); }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        /* Type toggle */
+        .type-toggle { display: flex; gap: 10px; margin-bottom: 20px; }
+        .type-btn { flex: 1; padding: 12px; border: 2px solid var(--border); border-radius: 10px; background: white; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s; font-family: 'Inter', sans-serif; color: #888; }
+        .type-btn.active { background: linear-gradient(135deg, var(--purple), var(--deep-red)); color: white; border-color: transparent; box-shadow: 0 4px 12px rgba(192,57,43,0.25); }
+
+        /* Success/Error */
+        .alert { padding: 14px 18px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; margin-top: 12px; display: none; }
+        .alert.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* Content List */
+        .list-card { background: white; border-radius: 20px; padding: 28px; box-shadow: 0 4px 20px rgba(255,107,0,0.08); border: 2px solid var(--border); }
+        .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border); }
+        .list-title { font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--deep-red); }
+        .filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+        .filter-btn { padding: 7px 14px; border: 2px solid var(--border); border-radius: 20px; background: white; cursor: pointer; font-size: 0.82rem; font-weight: 600; color: #888; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+        .filter-btn.active { background: var(--saffron); color: white; border-color: transparent; }
+        .content-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; border-radius: 10px; border: 1px solid #f0e0c8; margin-bottom: 10px; background: #fffdf8; transition: all 0.2s; }
+        .content-item:hover { background: #fff3e0; }
+        .item-info { flex: 1; }
+        .item-title { font-weight: 600; font-size: 0.95rem; color: #1a0a00; margin-bottom: 3px; }
+        .item-meta { font-size: 0.8rem; color: #999; }
+        .item-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; margin-right: 6px; }
+        .badge-8 { background: #ffe0d0; color: #C0392B; }
+        .badge-9 { background: #e8d5f5; color: #6C3483; }
+        .badge-10 { background: #fef3cc; color: #d68910; }
+        .badge-pdf { background: #d5f5e3; color: #1e8449; }
+        .badge-ann { background: #d6eaf8; color: #1a5276; }
+        .delete-btn { background: #fee; border: 1px solid #fcc; color: #c0392b; padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: all 0.2s; }
+        .delete-btn:hover { background: #fdd; }
+        .empty-list { text-align: center; padding: 40px; color: #ccc; font-size: 0.95rem; }
+
+        @media (max-width: 600px) {
+            .form-row { grid-template-columns: 1fr; }
+            .admin-container { padding: 20px 14px; }
+            .form-card, .list-card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+    <div class="login-card">
+        <div class="login-logo">🔐</div>
+        <div class="login-title">Admin Panel</div>
+        <div class="login-subtitle">Shabda Marathi Tutorials</div>
+        <input type="password" class="login-input" id="password-input" placeholder="Enter admin password" onkeydown="if(event.key==='Enter') login()" />
+        <button class="login-btn" onclick="login()">Login →</button>
+        <div class="login-error" id="login-error">❌ Wrong password. Try again.</div>
+    </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel">
+    <div class="admin-header">
+        <h1>🛠 Shabda Admin Panel</h1>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="admin-container">
+
+        <!-- Add Content Form -->
+        <div class="form-card">
+            <div class="form-title">➕ Add New Content</div>
+
+            <div class="type-toggle">
+                <button class="type-btn active" id="btn-pdf" onclick="setType('pdf')">📄 PDF / Study Material</button>
+                <button class="type-btn" id="btn-announcement" onclick="setType('announcement')">📢 Announcement</button>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Grade</label>
+                    <select class="form-control" id="f-grade">
+                        <option value="8">Class 8 — इयत्ता ८वी</option>
+                        <option value="9">Class 9 — इयत्ता ९वी</option>
+                        <option value="10">Class 10 — इयत्ता १०वी</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="text" class="form-control" id="f-date" placeholder="e.g. 3 May, 2026" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Title</label>
+                <input type="text" class="form-control" id="f-title" placeholder="e.g. Chapter 1 - Marathi Grammar Notes" />
+            </div>
+
+            <div class="form-group" id="link-group">
+                <label class="form-label">Google Drive Link (PDF)</label>
+                <input type="url" class="form-control" id="f-link" placeholder="Paste Google Drive link here" />
+            </div>
+
+            <div class="form-group" id="body-group" style="display:none">
+                <label class="form-label">Announcement Text</label>
+                <textarea class="form-control" id="f-body" placeholder="Write the announcement here in plain English or Marathi..."></textarea>
+            </div>
+
+            <button class="submit-btn" id="submit-btn" onclick="submitContent()">✅ Add Content</button>
+            <div class="alert success" id="alert-success">✅ Added successfully!</div>
+            <div class="alert error" id="alert-error">❌ Something went wrong. Try again.</div>
+        </div>
+
+        <!-- Content List -->
+        <div class="list-card">
+            <div class="list-header">
+                <div class="list-title">📋 All Content</div>
+                <div class="filter-tabs">
+                    <button class="filter-btn active" onclick="filterContent('all', this)">All</button>
+                    <button class="filter-btn" onclick="filterContent('8', this)">Class 8</button>
+                    <button class="filter-btn" onclick="filterContent('9', this)">Class 9</button>
+                    <button class="filter-btn" onclick="filterContent('10', this)">Class 10</button>
+                </div>
+            </div>
+            <div id="content-list"><div class="empty-list">Loading content...</div></div>
+        </div>
+
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC_ovW7U32n_ArCIhI9_jgUu4U5epnIXtw",
+        authDomain: "shabda-marathi.firebaseapp.com",
+        projectId: "shabda-marathi",
+        storageBucket: "shabda-marathi.firebasestorage.app",
+        messagingSenderId: "870748047457",
+        appId: "1:870748047457:web:0391e7509caeb197abc220"
+    };
+
+    const ADMIN_PASSWORD = "shabda2026";
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    let currentType = 'pdf';
+    let allContent = [];
+    let currentFilter = 'all';
+
+    window.login = function() {
+        const pwd = document.getElementById('password-input').value;
+        if (pwd === ADMIN_PASSWORD) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'block';
+            loadContent();
+            // Set today's date
+            const today = new Date();
+            document.getElementById('f-date').value = today.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+        } else {
+            document.getElementById('login-error').style.display = 'block';
+        }
+    }
+
+    window.logout = function() {
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('admin-panel').style.display = 'none';
+        document.getElementById('password-input').value = '';
+    }
+
+    window.setType = function(type) {
+        currentType = type;
+        document.getElementById('btn-pdf').className = 'type-btn' + (type === 'pdf' ? ' active' : '');
+        document.getElementById('btn-announcement').className = 'type-btn' + (type === 'announcement' ? ' active' : '');
+        document.getElementById('link-group').style.display = type === 'pdf' ? 'block' : 'none';
+        document.getElementById('body-group').style.display = type === 'announcement' ? 'block' : 'none';
+    }
+
+    window.submitContent = async function() {
+        const grade = document.getElementById('f-grade').value;
+        const title = document.getElementById('f-title').value.trim();
+        const date = document.getElementById('f-date').value.trim();
+        const link = document.getElementById('f-link').value.trim();
+        const body = document.getElementById('f-body').value.trim();
+
+        if (!title) { showAlert('error', '❌ Please enter a title.'); return; }
+        if (currentType === 'pdf' && !link) { showAlert('error', '❌ Please enter a Drive link.'); return; }
+        if (currentType === 'announcement' && !body) { showAlert('error', '❌ Please write the announcement text.'); return; }
+
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = true;
+        btn.textContent = 'Adding...';
+
+        try {
+            await addDoc(collection(db, 'content'), {
+                grade, title, date, type: currentType,
+                link: currentType === 'pdf' ? link : '',
+                body: currentType === 'announcement' ? body : '',
+                createdAt: serverTimestamp()
+            });
+            showAlert('success', '✅ Added successfully!');
+            document.getElementById('f-title').value = '';
+            document.getElementById('f-link').value = '';
+            document.getElementById('f-body').value = '';
+            loadContent();
+        } catch(e) {
+            showAlert('error', '❌ Something went wrong: ' + e.message);
+        }
+
+        btn.disabled = false;
+        btn.textContent = '✅ Add Content';
+    }
+
+    async function loadContent() {
+        try {
+            const q = query(collection(db, 'content'), orderBy('createdAt', 'desc'));
+            const snap = await getDocs(q);
+            allContent = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderContent();
+        } catch(e) {
+            document.getElementById('content-list').innerHTML = '<div class="empty-list">Error loading content.</div>';
+        }
+    }
+
+    function renderContent() {
+        const filtered = currentFilter === 'all' ? allContent : allContent.filter(c => c.grade === currentFilter);
+        const list = document.getElementById('content-list');
+        if (filtered.length === 0) {
+            list.innerHTML = '<div class="empty-list">No content yet. Add something above!</div>';
+            return;
+        }
+        list.innerHTML = filtered.map(item => `
+            <div class="content-item">
+                <div class="item-info">
+                    <div class="item-title">${item.title}</div>
+                    <div class="item-meta">
+                        <span class="item-badge badge-${item.grade}">Class ${item.grade}</span>
+                        <span class="item-badge ${item.type === 'pdf' ? 'badge-pdf' : 'badge-ann'}">${item.type === 'pdf' ? '📄 PDF' : '📢 Announcement'}</span>
+                        ${item.date || ''}
+                    </div>
+                </div>
+                <button class="delete-btn" onclick="deleteItem('${item.id}')">🗑 Delete</button>
+            </div>
+        `).join('');
+    }
+
+    window.filterContent = function(grade, btn) {
+        currentFilter = grade;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderContent();
+    }
+
+    window.deleteItem = async function(id) {
+        if (!confirm('Delete this item?')) return;
+        try {
+            await deleteDoc(doc(db, 'content', id));
+            allContent = allContent.filter(c => c.id !== id);
+            renderContent();
+        } catch(e) {
+            alert('Error deleting: ' + e.message);
+        }
+    }
+
+    function showAlert(type, msg) {
+        const el = document.getElementById('alert-' + type);
+        el.textContent = msg;
+        el.style.display = 'block';
+        setTimeout(() => el.style.display = 'none', 3000);
+    }
+</script>
+
+</body>
+</html>
